@@ -8,7 +8,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     }),
   ],
-  // This tells NextAuth to ignore the "localhost" default and trust Vercel
-  trustHost: true, 
   secret: process.env.AUTH_SECRET,
+  trustHost: true,
 })
