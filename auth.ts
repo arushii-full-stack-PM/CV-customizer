@@ -8,6 +8,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     }),
   ],
-  // We remove 'pages' and 'callbacks' for now to ensure the base connection works
   secret: process.env.AUTH_SECRET,
+  trustHost: true,
 })
