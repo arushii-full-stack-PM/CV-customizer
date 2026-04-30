@@ -1,9 +1,8 @@
 export function SiteFooter() {
   return (
-    <footer className="border-t border-border mt-2 pt-4 pb-6">
+    <footer className="border-t border-border mt-0 pt-4 pb-6"> {/* mt-0 to touch the content */}
       <div className="mx-auto max-w-4xl px-6 flex flex-col gap-4">
         
-        {/* Compressed Brand Card */}
         <div className="rounded-xl border border-border bg-card p-4 flex flex-col sm:flex-row items-center gap-4">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-900 text-xs font-bold text-white border border-border shadow-inner">
             AG
@@ -20,21 +19,19 @@ export function SiteFooter() {
           <a 
             href="https://www.linkedin.com/in/arushii-gupta-1a33b112/"
             target="_blank"
-            rel="noopener noreferrer"
-            className="flex shrink-0 items-center gap-2 rounded-lg bg-primary px-4 py-1.5 text-[10px] font-bold text-black hover:opacity-90 transition-all shadow-sm"
+            className="rounded-lg bg-primary px-4 py-1.5 text-[10px] font-bold text-black"
           >
             LinkedIn
           </a>
         </div>
 
-        {/* Footer Bottom Bar */}
         <div className="flex justify-between items-center text-[9px] text-text-subtle font-medium uppercase tracking-widest px-1">
           <p>© 2026 CV CUSTOMIZER</p>
-          <div className="flex gap-4">
+          <nav className="flex gap-4">
             <a href="#" className="hover:text-primary transition-colors">PRIVACY</a>
             <a href="#" className="hover:text-primary transition-colors">TERMS</a>
             <a href="#" className="hover:text-primary transition-colors">CONTACT</a>
-          </div>
+          </nav>
         </div>
       </div>
     </footer>
