@@ -4,16 +4,15 @@ export default async function Home() {
   const session = await auth();
 
   return (
-    <main className="flex flex-col items-center justify-center px-4 pt-4 pb-2">
+    <main className="flex flex-col items-center justify-center px-4 pt-6 pb-2">
       <div className="w-full max-w-3xl flex flex-col items-center">
         
         {/* Compressed Header Section */}
-        <div className="text-center mb-4 w-full">
-          <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-[8px] font-bold uppercase tracking-wider mb-2">
+        <div className="text-center mb-6 w-full">
+          <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-[8px] font-bold uppercase tracking-wider mb-3">
             AI Engine Active
           </div>
           
-          {/* Heading - Scaled down */}
           <h1 className="text-xl md:text-3xl font-extrabold tracking-tight mb-1 whitespace-nowrap">
             Tailor your CV to <span className="text-primary">every opportunity.</span>
           </h1>
@@ -25,9 +24,9 @@ export default async function Home() {
           </p>
         </div>
 
-        {/* Workspace Card - Reduced Height */}
+        {/* Workspace Card - Optimized Height */}
         <div className={`w-full transition-all duration-700 ${session ? 'opacity-100 scale-100' : 'opacity-30 scale-95 pointer-events-none grayscale'}`}>
-          <div className="bg-card border border-border rounded-xl p-5 shadow-xl">
+          <div className="bg-card border border-border rounded-xl p-5 shadow-xl shadow-black/20">
             <div className="flex flex-col gap-4">
               
               <div>
@@ -41,7 +40,7 @@ export default async function Home() {
 
               <div>
                 <label className="text-[9px] font-bold uppercase tracking-widest text-text-subtle mb-1.5 block">Resume Submission</label>
-                {/* Fixed: Reduced height of upload box */}
+                {/* Reduced height from py-12 to py-6 */}
                 <div className="border border-dashed border-border rounded-lg py-6 flex flex-col items-center justify-center bg-slate-950/50 hover:bg-primary/5 hover:border-primary/50 transition-all cursor-pointer group">
                   <svg className="w-5 h-5 text-text-subtle group-hover:text-primary mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
                   <span className="text-[9px] font-bold text-text-subtle uppercase tracking-tighter">Upload PDF Resume</span>
@@ -52,7 +51,7 @@ export default async function Home() {
                 disabled={!session}
                 className={`w-full py-2.5 rounded-lg font-bold text-xs transition-all ${
                   session 
-                  ? 'bg-primary text-black hover:brightness-105' 
+                  ? 'bg-primary text-black hover:brightness-105 shadow-md shadow-indigo-500/10' 
                   : 'bg-disabled-button-bg text-disabled-button-text'
                 }`}
               >
