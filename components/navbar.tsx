@@ -1,3 +1,5 @@
+"use server"
+
 import { auth, signIn, signOut } from "@/auth"
 
 export default async function Navbar() {
@@ -28,14 +30,14 @@ export default async function Navbar() {
               {session.user.name?.split(' ')[0]}
             </span>
             <form action={async () => { "use server"; await signOut(); }}>
-              <button className="text-xs text-slate-400 hover:text-white transition-colors px-2">
+              <button type="submit" className="text-xs text-slate-400 hover:text-white transition-colors px-2">
                 Sign out
               </button>
             </form>
           </div>
         ) : (
           <form action={async () => { "use server"; await signIn("google"); }}>
-            <button className="bg-white text-black px-4 py-2 rounded-lg font-semibold text-sm hover:bg-slate-200 transition-all">
+            <button type="submit" className="bg-white text-black px-4 py-2 rounded-lg font-semibold text-sm hover:bg-slate-200 transition-all">
               Sign in
             </button>
           </form>
