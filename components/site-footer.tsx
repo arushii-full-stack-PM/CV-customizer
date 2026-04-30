@@ -23,7 +23,7 @@ export function SiteFooter() {
           </div>
 
           {/* LinkedIn CTA */}
-          
+          <a 
             href="https://www.linkedin.com/in/arushii-gupta-1a33b112/"
             target="_blank"
             rel="noopener noreferrer"
