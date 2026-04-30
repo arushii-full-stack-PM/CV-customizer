@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useSession, signIn, signOut } from "next-auth/react"
 import { Navbar } from "@/components/navbar"
 import { CVForm } from "@/components/cv-form"
 import { SiteFooter } from "@/components/site-footer"
@@ -13,11 +13,12 @@ const TRUST_BADGES = [
 ]
 
 export default function HomePage() {
-  // Simulated auth state – toggled via the sign-in / sign-out buttons
-  const [isSignedIn, setIsSignedIn] = useState(false)
+  // ── REAL Auth State ─────────────────────────────────────────────
+  const { data: session, status } = useSession()
+  const isSignedIn = status === "authenticated"
 
-  const handleSignIn = () => setIsSignedIn(true)
-  const handleSignOut = () => setIsSignedIn(false)
+  const handleSignIn = () => signIn("google")
+  const handleSignOut = () => signOut()
 
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
@@ -48,7 +49,7 @@ export default function HomePage() {
             <span className="text-primary">every job.</span>
           </h1>
           <p className="mt-4 text-pretty text-lg text-[var(--text-muted)] sm:text-xl">
-            Get shortlisted faster.
+            Get shortlisted faster. {session?.user?.name ? `Welcome back, ${session.user.name}!` : ""}
           </p>
 
           {/* Trust badges */}
