@@ -1,13 +1,10 @@
 import { auth } from "@/auth";
-import Navbar from "@/components/navbar";
 
 export default async function Home() {
   const session = await auth();
 
   return (
     <main className="min-h-screen bg-[#020617] text-white">
-      <Navbar />
-      
       <div className="max-w-4xl mx-auto pt-20 pb-12 px-4 text-center">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-medium mb-6">
           <span className="relative flex h-2 w-2">
@@ -27,7 +24,6 @@ export default async function Home() {
             : "Get shortlisted faster. Connect your Google account to start tailoring your resume with AI."}
         </p>
 
-        {/* WORKSPACE AREA */}
         <div className={`mt-12 transition-all duration-700 ${session ? 'opacity-100 scale-100' : 'opacity-50 scale-95 pointer-events-none grayscale'}`}>
             <div className="bg-slate-900/50 border border-slate-800 rounded-3xl p-8 shadow-2xl backdrop-blur-sm">
                 <p className="text-sm text-slate-500 mb-4 font-mono uppercase tracking-widest">Analysis Engine</p>
