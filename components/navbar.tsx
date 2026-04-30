@@ -1,47 +1,48 @@
-"use server"
+"use client"
+import Link from "next/link"
+import { useSession, signIn, signOut } from "next-auth/react"
 
-import { auth, signIn, signOut } from "@/auth"
-
-export default async function Navbar() {
-  const session = await auth()
+export default function Navbar() {
+  const { data: session } = useSession()
 
   return (
-    <nav className="flex items-center justify-between px-6 py-4 bg-[#0f172a] border-b border-slate-800">
-      {/* Left side: Logo */}
-      <div className="flex items-center gap-2">
-        <div className="bg-blue-600 p-1.5 rounded-lg">
-          <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-          </svg>
-        </div>
-        <span className="font-bold text-xl text-white tracking-tight">CV Customizer</span>
-      </div>
+    <nav className="border-b border-border bg-background h-16 flex items-center">
+      <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-6">
+        <Link href="/" className="flex items-center gap-2">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-black">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+              <polyline points="14 2 14 8 20 8" />
+            </svg>
+          </div>
+          {/* Logo font size reduced to be smaller than the main H1 */}
+          <span className="text-lg md:text-2xl font-bold tracking-tight text-foreground">
+            CV Customizer
+          </span>
+        </Link>
 
-      {/* Right side: Auth State */}
-      <div className="flex items-center gap-4">
-        {session?.user ? (
-          <div className="flex items-center gap-3 bg-slate-800/50 p-1 pr-3 rounded-full border border-slate-700">
-            <img 
-              src={session.user.image || ""} 
-              alt="User" 
-              className="w-8 h-8 rounded-full border border-blue-500"
-            />
-            <span className="text-sm font-medium text-slate-200 hidden sm:inline-block">
-              {session.user.name?.split(' ')[0]}
-            </span>
-            <form action={async () => { "use server"; await signOut(); }}>
-              <button type="submit" className="text-xs text-slate-400 hover:text-white transition-colors px-2">
+        <div className="flex items-center gap-4">
+          {session ? (
+            <div className="flex items-center gap-4">
+              <span className="hidden text-sm text-text-muted sm:inline-block">
+                {session.user?.name}
+              </span>
+              <button
+                onClick={() => signOut()}
+                className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-card transition-colors"
+              >
                 Sign out
               </button>
-            </form>
-          </div>
-        ) : (
-          <form action={async () => { "use server"; await signIn("google"); }}>
-            <button type="submit" className="bg-white text-black px-4 py-2 rounded-lg font-semibold text-sm hover:bg-slate-200 transition-all">
+            </div>
+          ) : (
+            <button
+              onClick={() => signIn("google")}
+              className="rounded-lg bg-primary px-4 py-2 text-sm font-bold text-black hover:brightness-110 transition-all"
+            >
               Sign in
             </button>
-          </form>
-        )}
+          )}
+        </div>
       </div>
     </nav>
   )
