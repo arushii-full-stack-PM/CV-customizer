@@ -4,7 +4,7 @@ export default async function Home() {
   const session = await auth();
 
   return (
-    <main className="flex flex-col items-center justify-center px-4 pt-6 pb-2">
+    <main className="flex flex-col items-center justify-center px-4 pt-6 pb-0">
       <div className="w-full max-w-3xl flex flex-col items-center">
         
         {/* Compressed Header Section */}
@@ -24,7 +24,7 @@ export default async function Home() {
           </p>
         </div>
 
-        {/* Workspace Card - Optimized Height */}
+        {/* Workspace Card */}
         <div className={`w-full transition-all duration-700 ${session ? 'opacity-100 scale-100' : 'opacity-30 scale-95 pointer-events-none grayscale'}`}>
           <div className="bg-card border border-border rounded-xl p-5 shadow-xl shadow-black/20">
             <div className="flex flex-col gap-4">
@@ -40,7 +40,6 @@ export default async function Home() {
 
               <div>
                 <label className="text-[9px] font-bold uppercase tracking-widest text-text-subtle mb-1.5 block">Resume Submission</label>
-                {/* Reduced height from py-12 to py-6 */}
                 <div className="border border-dashed border-border rounded-lg py-6 flex flex-col items-center justify-center bg-slate-950/50 hover:bg-primary/5 hover:border-primary/50 transition-all cursor-pointer group">
                   <svg className="w-5 h-5 text-text-subtle group-hover:text-primary mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
                   <span className="text-[9px] font-bold text-text-subtle uppercase tracking-tighter">Upload PDF Resume</span>
