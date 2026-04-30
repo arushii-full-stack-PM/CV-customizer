@@ -3,7 +3,7 @@
 import { useSession, signIn, signOut } from "next-auth/react"
 import { Navbar } from "./components/navbar"
 import { CVForm } from "./components/cv-form"
-import { SiteFooter } from "@/components/site-footer"
+import { SiteFooter } from "./components/site-footer"
 import { CheckCircle2 } from "lucide-react"
 
 const TRUST_BADGES = [
