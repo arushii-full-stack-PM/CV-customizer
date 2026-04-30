@@ -1,6 +1,6 @@
 export function SiteFooter() {
   return (
-    <footer className="border-t border-border mt-4 pt-6 pb-6">
+    <footer className="border-t border-border mt-2 pt-4 pb-6">
       <div className="mx-auto max-w-4xl px-6 flex flex-col gap-4">
         
         {/* Compressed Brand Card */}
@@ -29,11 +29,11 @@ export function SiteFooter() {
 
         {/* Footer Bottom Bar */}
         <div className="flex justify-between items-center text-[9px] text-text-subtle font-medium uppercase tracking-widest px-1">
-          <p>© 2026 CV Customizer</p>
+          <p>© 2026 CV CUSTOMIZER</p>
           <div className="flex gap-4">
-            <a href="#" className="hover:text-primary transition-colors">Privacy</a>
-            <a href="#" className="hover:text-primary transition-colors">Terms</a>
-            <a href="#" className="hover:text-primary transition-colors">Contact</a>
+            <a href="#" className="hover:text-primary transition-colors">PRIVACY</a>
+            <a href="#" className="hover:text-primary transition-colors">TERMS</a>
+            <a href="#" className="hover:text-primary transition-colors">CONTACT</a>
           </div>
         </div>
       </div>
