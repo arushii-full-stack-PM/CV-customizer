@@ -1,6 +1,6 @@
 "use client"
 import { useState, useEffect } from "react"
-import { Navbar } from "@/components/navbar"
+import Navbar from "@/components/navbar"
 import { SiteFooter } from "@/components/site-footer"
 import { CheckCircle2, XCircle, AlertTriangle, Zap, BarChart2, FileText } from "lucide-react"
 
