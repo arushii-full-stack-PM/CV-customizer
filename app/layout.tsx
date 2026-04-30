@@ -9,20 +9,6 @@ import './globals.css'
 const geist = Geist({ subsets: ["latin"], variable: "--font-geist-sans" });
 const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono" });
 
-export const metadata: Metadata = {
-  title: 'CV Customizer – Tailor your CV to every job',
-  description: 'Tailor your CV to every job. Get shortlisted faster. Paste a job description URL and upload your CV to get an AI-powered analysis.',
-  generator: 'v0.app',
-  icons: {
-    icon: [
-      { url: '/icon-light-32x32.png', media: '(prefers-color-scheme: light)' },
-      { url: '/icon-dark-32x32.png', media: '(prefers-color-scheme: dark)' },
-      { url: '/icon.svg', type: 'image/svg+xml' },
-    ],
-    apple: '/apple-icon.png',
-  },
-}
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -33,12 +19,11 @@ export default function RootLayout({
       <body className={`${geist.variable} ${geistMono.variable} font-sans antialiased bg-background text-foreground`}>
         <Providers>
           <Navbar />
-          <div className="min-h-screen flex flex-col">
-            <div className="flex-grow">
-              {children}
-            </div>
-            <SiteFooter />
-          </div>
+          {/* REMOVED: min-h-screen and flex-grow wrapper */}
+          <main>
+            {children}
+          </main>
+          <SiteFooter />
         </Providers>
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
