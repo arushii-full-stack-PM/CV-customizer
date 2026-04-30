@@ -1,7 +1,7 @@
 "use client"
 
 import { useSession, signIn, signOut } from "next-auth/react"
-import { Navbar } from "@/components/navbar"
+import { Navbar } from "./components/navbar"
 import { CVForm } from "@/components/cv-form"
 import { SiteFooter } from "@/components/site-footer"
 import { CheckCircle2 } from "lucide-react"
