@@ -4,46 +4,59 @@ export default async function Home() {
   const session = await auth();
 
   return (
-    <main className="h-[calc(100vh-140px)] flex items-center justify-center p-4">
+    <main className="min-h-[calc(100vh-140px)] flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-4xl flex flex-col items-center">
-        {/* Minimalist Header */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-[10px] font-bold uppercase tracking-widest mb-4">
+        
+        {/* Condensed 1-Line Header Section */}
+        <div className="text-center mb-8 w-full">
+          <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-[9px] font-bold uppercase tracking-wider mb-4">
             AI Engine Active
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-3">
-            Optimize your <span className="text-primary">Career Path.</span>
+          
+          {/* Heading: Forced to 1 line */}
+          <h1 className="text-2xl md:text-4xl font-extrabold tracking-tight mb-2 whitespace-nowrap">
+            Tailor your CV to <span className="text-primary">every opportunity.</span>
           </h1>
-          <p className="text-text-muted text-sm max-w-md mx-auto">
+          
+          {/* Subheading: Forced to 1 line */}
+          <p className="text-text-muted text-[11px] sm:text-xs truncate w-full max-w-2xl mx-auto">
             {session 
-              ? `Ready for your next move, ${session.user?.name?.split(' ')[0]}?` 
-              : "Professional CV analysis and job matching tool."}
+              ? `Welcome back, ${session.user?.name}. Your AI-powered workspace is ready for analysis.` 
+              : "Connect your Google account to start tailoring your resume with precision AI analysis."}
           </p>
         </div>
 
-        {/* Workspace Card - No Scroll Needed */}
-        <div className={`w-full transition-all duration-500 ${session ? 'opacity-100' : 'opacity-40 grayscale pointer-events-none'}`}>
-          <div className="bg-card border border-border rounded-2xl p-6 shadow-2xl shadow-primary/5">
+        {/* Workspace Card */}
+        <div className={`w-full transition-all duration-700 ${session ? 'opacity-100 scale-100' : 'opacity-30 scale-95 pointer-events-none grayscale'}`}>
+          <div className="bg-card border border-border rounded-2xl p-6 shadow-2xl shadow-indigo-950/20">
             <div className="flex flex-col gap-5">
+              
               <div>
-                <label className="text-[10px] font-bold uppercase tracking-widest text-text-subtle mb-2 block">Job Description</label>
+                <label className="text-[10px] font-semibold uppercase tracking-widest text-text-subtle mb-2 block">Job Description URL</label>
                 <input 
                   type="text" 
-                  placeholder="Paste URL or Role Title..." 
-                  className="w-full bg-background border border-border p-3 rounded-lg text-sm focus:ring-1 focus:ring-primary outline-none transition-all" 
+                  placeholder="Paste the link to the job posting..." 
+                  className="w-full bg-slate-950 border border-border p-3 rounded-xl text-xs focus:ring-1 focus:ring-primary outline-none transition-all" 
                 />
               </div>
 
               <div>
-                <label className="text-[10px] font-bold uppercase tracking-widest text-text-subtle mb-2 block">Resume Upload</label>
-                <div className="border border-dashed border-border rounded-lg py-10 flex flex-col items-center justify-center bg-background/50 hover:bg-primary/5 hover:border-primary/50 transition-all cursor-pointer group">
-                  <svg className="w-6 h-6 text-text-subtle group-hover:text-primary mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
-                  <span className="text-xs text-text-subtle">Upload PDF (Max 5MB)</span>
+                <label className="text-[10px] font-semibold uppercase tracking-widest text-text-subtle mb-2 block">Resume Submission</label>
+                <div className="border border-dashed border-border rounded-xl py-8 flex flex-col items-center justify-center bg-slate-950/50 hover:bg-primary/5 hover:border-primary/50 transition-all cursor-pointer group">
+                  <svg className="w-6 h-6 text-text-subtle group-hover:text-primary mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
+                  <span className="text-[10px] font-medium text-text-subtle uppercase tracking-wide">Upload PDF Resume</span>
                 </div>
               </div>
 
-              <button className="w-full py-3 bg-primary text-white rounded-lg font-bold text-sm hover:brightness-110 transition-all shadow-lg shadow-primary/20">
-                {session ? "Run Comparison Analysis" : "Sign in to Continue"}
+              <button 
+                disabled={!session}
+                className={`w-full py-3.5 rounded-xl font-bold text-xs transition-all shadow-xl ${
+                  session 
+                  ? 'bg-primary text-black hover:brightness-110 shadow-indigo-500/15' 
+                  : 'bg-disabled-button-bg text-disabled-button-text'
+                }`}
+              >
+                {session ? "Run Comparison Analysis →" : "Sign in to Analyze"}
               </button>
             </div>
           </div>
