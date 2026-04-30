@@ -1,6 +1,5 @@
 "use client"
 import { useState, useEffect } from "react"
-import Navbar from "@/components/navbar"
 import { SiteFooter } from "@/components/site-footer"
 import { CheckCircle2, XCircle, AlertTriangle, Zap, BarChart2, FileText } from "lucide-react"
 
@@ -63,7 +62,6 @@ export default function ResultsPage() {
   if (notFound) {
     return (
       <div className="flex min-h-screen flex-col bg-background text-foreground">
-        <Navbar isSignedIn={true} onSignIn={() => {}} onSignOut={() => {}} />
         <main className="flex flex-1 flex-col items-center justify-center gap-4">
           <p className="text-lg text-[var(--text-muted)]">No analysis found.</p>
           <a href="/" className="text-primary hover:underline">← Go back and analyze your CV</a>
@@ -76,7 +74,6 @@ export default function ResultsPage() {
   if (!data) {
     return (
       <div className="flex min-h-screen flex-col bg-background text-foreground">
-        <Navbar isSignedIn={true} onSignIn={() => {}} onSignOut={() => {}} />
         <main className="flex flex-1 flex-col items-center justify-center gap-4">
           <svg className="h-8 w-8 animate-spin text-primary" viewBox="0 0 24 24" fill="none">
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
@@ -91,25 +88,16 @@ export default function ResultsPage() {
 
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
-      <Navbar isSignedIn={true} onSignIn={() => {}} onSignOut={() => {}} />
-
-      <main className="flex flex-1 flex-col items-center px-6 pb-20 pt-32">
+      <main className="flex flex-1 flex-col items-center px-6 pb-20 pt-10">
         <div className="w-full max-w-5xl">
-
-          {/* Analyze Another button */}
           <div className="mb-6">
             <a href="/" className="text-sm text-primary hover:underline">← Analyze Another</a>
           </div>
-
-          {/* Score Ring */}
           <div className="rounded-2xl border border-white/10 bg-white/5 p-6 mb-8">
             <ScoreRing score={data.matchScore} />
           </div>
-
-          {/* 6 Cards Grid */}
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-
-            {/* Card 1 - Matched Keywords */}
+            {/* Card 1 - Keywords */}
             <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
               <div className="flex items-center gap-2 mb-4">
                 <CheckCircle2 className="text-green-400 h-5 w-5" />
@@ -117,14 +105,11 @@ export default function ResultsPage() {
               </div>
               <div className="flex flex-wrap gap-2">
                 {data.matchedKeywords.map((kw) => (
-                  <span key={kw} className="rounded-full bg-green-500/10 border border-green-500/30 px-3 py-1 text-xs text-green-400">
-                    {kw}
-                  </span>
+                  <span key={kw} className="rounded-full bg-green-500/10 border border-green-500/30 px-3 py-1 text-xs text-green-400">{kw}</span>
                 ))}
               </div>
             </div>
-
-            {/* Card 2 - Missing Keywords */}
+            {/* Card 2 - Missing */}
             <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
               <div className="flex items-center gap-2 mb-4">
                 <XCircle className="text-red-400 h-5 w-5" />
@@ -132,13 +117,10 @@ export default function ResultsPage() {
               </div>
               <div className="flex flex-wrap gap-2">
                 {data.missingKeywords.map((kw) => (
-                  <span key={kw} className="rounded-full bg-red-500/10 border border-red-500/30 px-3 py-1 text-xs text-red-400">
-                    {kw}
-                  </span>
+                  <span key={kw} className="rounded-full bg-red-500/10 border border-red-500/30 px-3 py-1 text-xs text-red-400">{kw}</span>
                 ))}
               </div>
             </div>
-
             {/* Card 3 - Skills Gap */}
             <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
               <div className="flex items-center gap-2 mb-4">
@@ -162,8 +144,7 @@ export default function ResultsPage() {
                 </tbody>
               </table>
             </div>
-
-            {/* Card 4 - Suggested Rewrites */}
+            {/* Card 4 - Rewrites */}
             <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
               <div className="flex items-center gap-2 mb-4">
                 <FileText className="text-primary h-5 w-5" />
@@ -187,7 +168,6 @@ export default function ResultsPage() {
                 ))}
               </div>
             </div>
-
             {/* Card 5 - Red Flags */}
             <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
               <div className="flex items-center gap-2 mb-4">
@@ -203,7 +183,6 @@ export default function ResultsPage() {
                 ))}
               </ul>
             </div>
-
             {/* Card 6 - Quick Wins */}
             <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
               <div className="flex items-center gap-2 mb-4">
@@ -213,15 +192,12 @@ export default function ResultsPage() {
               <ol className="flex flex-col gap-3">
                 {data.quickWins.map((win, i) => (
                   <li key={i} className="flex items-start gap-3 text-sm text-[var(--text-muted)]">
-                    <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/20 text-xs font-bold text-primary">
-                      {i + 1}
-                    </span>
+                    <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/20 text-xs font-bold text-primary">{i + 1}</span>
                     {win}
                   </li>
                 ))}
               </ol>
             </div>
-
           </div>
         </div>
       </main>
