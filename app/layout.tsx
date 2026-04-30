@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { Providers } from "@/components/providers"
 import Navbar from "@/components/navbar"
+import { SiteFooter } from "@/components/site-footer"
 import './globals.css'
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-geist-sans" });
@@ -32,7 +33,12 @@ export default function RootLayout({
       <body className={`${geist.variable} ${geistMono.variable} font-sans antialiased bg-background text-foreground`}>
         <Providers>
           <Navbar />
-          {children}
+          <div className="min-h-screen flex flex-col">
+            <div className="flex-grow">
+              {children}
+            </div>
+            <SiteFooter />
+          </div>
         </Providers>
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
