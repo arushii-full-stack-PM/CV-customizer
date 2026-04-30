@@ -1,38 +1,17 @@
 "use client"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Navbar } from "@/components/navbar"
 import { SiteFooter } from "@/components/site-footer"
 import { CheckCircle2, XCircle, AlertTriangle, Zap, BarChart2, FileText } from "lucide-react"
 
-const MOCK_DATA = {
-  score: 74,
-  matchedKeywords: ["React", "TypeScript", "REST APIs", "Agile", "Git", "Node.js"],
-  missingKeywords: ["GraphQL", "AWS", "Docker", "CI/CD", "PostgreSQL"],
-  skillsGap: [
-    { jdRequires: "GraphQL APIs", cvHas: "REST APIs only" },
-    { jdRequires: "AWS deployment", cvHas: "No cloud experience" },
-    { jdRequires: "Docker containers", cvHas: "Not mentioned" },
-  ],
-  suggestedRewrites: [
-    {
-      original: "Worked on frontend features using React",
-      rewritten: "Engineered scalable React components improving page load speed by 40%",
-    },
-    {
-      original: "Helped with API integration",
-      rewritten: "Designed and integrated 10+ REST APIs enabling seamless data exchange across services",
-    },
-  ],
-  redFlags: [
-    "Employment gap of 8 months not explained",
-    "No measurable achievements mentioned",
-    "Job title mismatch — JD says 'Senior' but CV shows junior-level responsibilities",
-  ],
-  quickWins: [
-    "Add GraphQL to your skills section if you have any exposure to it",
-    "Quantify your achievements with numbers and percentages",
-    "Rewrite your summary to mirror the JD language",
-  ],
+interface AnalysisResult {
+  matchScore: number
+  matchedKeywords: string[]
+  missingKeywords: string[]
+  skillsGap: { jdRequires: string; cvHas: string }[]
+  suggestedRewrites: { original: string; rewritten: string }[]
+  redFlags: string[]
+  quickWins: string[]
 }
 
 function ScoreRing({ score }: { score: number }) {
@@ -68,16 +47,51 @@ function ScoreRing({ score }: { score: number }) {
 }
 
 export default function ResultsPage() {
+  const [data, setData] = useState<AnalysisResult | null>(null)
   const [expandedRewrite, setExpandedRewrite] = useState<number | null>(null)
-  const data = MOCK_DATA
+  const [notFound, setNotFound] = useState(false)
+
+  useEffect(() => {
+    const stored = sessionStorage.getItem("cvAnalysis")
+    if (stored) {
+      setData(JSON.parse(stored))
+    } else {
+      setNotFound(true)
+    }
+  }, [])
+
+  if (notFound) {
+    return (
+      <div className="flex min-h-screen flex-col bg-background text-foreground">
+        <Navbar isSignedIn={true} onSignIn={() => {}} onSignOut={() => {}} />
+        <main className="flex flex-1 flex-col items-center justify-center gap-4">
+          <p className="text-lg text-[var(--text-muted)]">No analysis found.</p>
+          <a href="/" className="text-primary hover:underline">← Go back and analyze your CV</a>
+        </main>
+        <SiteFooter />
+      </div>
+    )
+  }
+
+  if (!data) {
+    return (
+      <div className="flex min-h-screen flex-col bg-background text-foreground">
+        <Navbar isSignedIn={true} onSignIn={() => {}} onSignOut={() => {}} />
+        <main className="flex flex-1 flex-col items-center justify-center gap-4">
+          <svg className="h-8 w-8 animate-spin text-primary" viewBox="0 0 24 24" fill="none">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
+          </svg>
+          <p className="text-[var(--text-muted)]">Loading your results...</p>
+        </main>
+        <SiteFooter />
+      </div>
+    )
+  }
 
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
-      <Navbar
-        isSignedIn={true}
-        onSignIn={() => {}}
-        onSignOut={() => {}}
-      />
+      <Navbar isSignedIn={true} onSignIn={() => {}} onSignOut={() => {}} />
 
       <main className="flex flex-1 flex-col items-center px-6 pb-20 pt-32">
         <div className="w-full max-w-5xl">
@@ -89,7 +103,7 @@ export default function ResultsPage() {
 
           {/* Score Ring */}
           <div className="rounded-2xl border border-white/10 bg-white/5 p-6 mb-8">
-            <ScoreRing score={data.score} />
+            <ScoreRing score={data.matchScore} />
           </div>
 
           {/* 6 Cards Grid */}
