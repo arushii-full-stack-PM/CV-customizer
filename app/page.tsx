@@ -1,12 +1,19 @@
 import { auth } from "@/auth"
 import { CVFormWrapper } from "@/components/cv-form-wrapper"
 
+const TRUST_SIGNALS = [
+  { icon: "🔒", text: "Your CV is never stored" },
+  { icon: "⚡", text: "Results in under 30 seconds" },
+  { icon: "🎯", text: "Tailored to every job" },
+]
+
 export default async function Home() {
   const session = await auth()
 
   return (
     <div className="flex flex-col items-center px-4 pt-2 pb-0">
       <div className="w-full max-w-3xl flex flex-col items-center">
+
         <div className="text-center mb-4 w-full">
           <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-[8px] font-bold uppercase tracking-wider mb-2">
             AI Engine Active
@@ -20,9 +27,28 @@ export default async function Home() {
               : "Connect your Google account to start tailoring your resume with precision AI analysis."}
           </p>
         </div>
+
+        {/* Trust signals */}
+        <div className="mb-3 flex flex-wrap items-center justify-center gap-2">
+          {TRUST_SIGNALS.map((signal) => (
+            <div key={signal.text} className="flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[10px] text-slate-300">
+              <span>{signal.icon}</span>
+              <span>{signal.text}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* Sign in reason */}
+        {!session && (
+          <p className="mb-3 text-center text-[10px] text-slate-400">
+            🔐 We use sign-in to prevent abuse and keep your results private.
+          </p>
+        )}
+
         <div className="w-full">
           <CVFormWrapper isSignedIn={!!session} />
         </div>
+
       </div>
     </div>
   )
