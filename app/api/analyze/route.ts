@@ -17,19 +17,29 @@ export async function POST(req: NextRequest) {
       messages: [
         {
           role: "user",
-          content: `You are a high-precision ATS engine and technical recruiter.
-Task: Audit the provided CV against the Job Description.
+          content: `You are a senior technical recruiter and ATS expert with deep understanding of semantic equivalence in job matching.
+
+Task: Audit the CV against the Job Description with HIGH semantic intelligence.
 Output: Return ONLY a raw JSON object. No preamble, no markdown, no backticks.
 
-STRICT QUALITY CONSTRAINTS:
-1. DO NOT use vague phrases like "good fit" or "relevant experience"
-2. Every matched keyword must be explicitly present in the CV text
-3. If a skill is not explicitly found, it is missing — do not assume
-4. Do not mark something as missing if any variation of it appears in the CV
-5. Keep each string value under 100 characters to avoid truncation
-6. Limit matchedKeywords and missingKeywords to 8 items each maximum
-7. Limit skillsGap to 5 items maximum
-8. Limit suggestedRewrites to 3 items maximum
+SEMANTIC MATCHING RULES — follow these strictly:
+1. Treat semantically equivalent terms as MATCHES. Examples:
+   - "B2B2C" matches "B2B" or "B2C" contexts
+   - "Product Manager" matches "PM", "Product Lead", "Product Owner"
+   - "e-commerce" matches "online retail", "digital commerce"
+   - "AI-powered" matches "machine learning", "ML", "artificial intelligence"
+   - "stakeholder management" matches "cross-functional collaboration"
+   - "pricing strategy" matches "monetization", "revenue optimization"
+   - "growth" matches "user acquisition", "retention", "conversion"
+   - Acronyms match their full forms and vice versa
+2. If a concept appears in the CV even with different wording, mark it as a MATCH
+3. Only mark as MISSING if the concept is genuinely absent — not just differently worded
+4. For skillsGap, only list skills with NO semantic equivalent in the CV
+5. Keep each string value under 100 characters
+6. Limit matchedKeywords to 10 items max
+7. Limit missingKeywords to 8 items max
+8. Limit skillsGap to 5 items max
+9. Limit suggestedRewrites to 3 items max
 
 Job Description:
 ${jdText}
@@ -37,18 +47,18 @@ ${jdText}
 CV Text:
 ${cvText}
 
-Return EXACTLY this JSON structure with no deviations:
+Return EXACTLY this JSON structure:
 {
-  "matchScore": <number 0-100>,
-  "matchedKeywords": ["keyword1", "keyword2"],
-  "missingKeywords": ["keyword1", "keyword2"],
+  "matchScore": <number 0-100, based on semantic match not just keyword match>,
+  "matchedKeywords": ["keyword or concept found in both — use the JD's terminology"],
+  "missingKeywords": ["genuinely absent concepts with no semantic equivalent in CV"],
   "skillsGap": [
-    { "jdRequires": "what JD wants", "cvHas": "what CV shows instead or Not mentioned" }
+    { "jdRequires": "specific JD requirement", "cvHas": "closest thing in CV or Not mentioned" }
   ],
   "suggestedRewrites": [
-    { "original": "existing CV bullet", "rewritten": "improved version aligned to JD" }
+    { "original": "existing CV bullet", "rewritten": "improved version using JD terminology" }
   ],
-  "redFlags": ["specific issue 1", "specific issue 2"],
+  "redFlags": ["specific issue that could hurt shortlisting"],
   "quickWins": ["high impact change 1", "high impact change 2", "high impact change 3"]
 }`,
         },
