@@ -1,23 +1,15 @@
-"use client"
-
 export function SiteFooter() {
   return (
-    <footer className="border-t border-[var(--border)] mt-0 pt-6 pb-8">
-      <div className="mx-auto max-w-4xl px-6 flex flex-col gap-6">
-
-        {/* Branding Card */}
-        <div className="rounded-xl border border-[var(--border)] bg-[var(--card)] p-5 flex flex-col sm:flex-row items-center sm:items-start gap-4">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary text-sm font-bold text-white">
+    <footer className="border-t border-border mt-0 pt-4 pb-6">
+      <div className="mx-auto max-w-4xl px-6 flex flex-col gap-4">
+        <div className="rounded-xl border border-border bg-card p-4 flex flex-col sm:flex-row items-center gap-4">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-900 text-xs font-bold text-white border border-border shadow-inner">
             AG
           </div>
-          <div className="flex flex-col gap-1 text-center sm:text-left flex-grow">
-            <p className="text-xs font-bold uppercase tracking-widest text-primary">
-              Created by
-            </p>
-            <p className="text-base font-bold text-foreground">
-              Arushii Gupta
-            </p>
-            <p className="text-sm text-[var(--text-muted)] leading-snug">
+          <div className="flex flex-col text-center sm:text-left flex-grow">
+            <p className="text-[8px] font-bold uppercase tracking-widest text-primary">Created by</p>
+            <p className="text-base font-bold text-foreground">Arushii Gupta</p>
+            <p className="text-[11px] text-[var(--text-muted)] leading-snug">
               Full-stack Product Manager · 9 yrs in e-commerce (pricing, conversion, growth) · Now shipping AI-powered products end-to-end · Open to opportunities
             </p>
           </div>
@@ -25,22 +17,19 @@ export function SiteFooter() {
             href="https://www.linkedin.com/in/arushii-gupta-1a33b112/"
             target="_blank"
             rel="noopener noreferrer"
-            className="shrink-0 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+            className="rounded-lg bg-primary px-4 py-1.5 text-[10px] font-bold text-white"
           >
-            {"Let's talk on LinkedIn"}
+            LinkedIn
           </a>
         </div>
-
-        {/* Bottom bar */}
-        <div className="flex flex-col sm:flex-row justify-between items-center text-xs text-[var(--text-subtle)] px-1 gap-3">
-          <p>{"© 2026 CV Customizer. All rights reserved."}</p>
-          <nav className="flex gap-5">
+        <div className="flex justify-between items-center text-[9px] text-[var(--text-subtle)] font-medium uppercase tracking-widest px-1">
+          <p>2026 CV Customizer</p>
+          <nav className="flex gap-4">
             <a href="#" className="hover:text-primary transition-colors">Privacy</a>
             <a href="#" className="hover:text-primary transition-colors">Terms</a>
             <a href="#" className="hover:text-primary transition-colors">Contact</a>
           </nav>
         </div>
-
       </div>
     </footer>
   )
