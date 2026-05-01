@@ -7,9 +7,9 @@ export function SiteFooter() {
             AG
           </div>
           <div className="flex flex-col text-center sm:text-left flex-grow gap-0.5">
-            <p className="text-[9px] font-bold uppercase tracking-widest text-primary">Created by</p>
+            <p className="text-[9px] font-bold uppercase tracking-widest text-primary">Created & Maintained by</p>
             <p className="text-sm font-bold text-white">Arushii Gupta</p>
-            <p className="text-sm text-slate-300 leading-snug">Full-stack Product Manager · 9 yrs in e-commerce (pricing, conversion, growth) · Now shipping AI-powered products end-to-end · Open to opportunities</p>
+            <p className="text-sm text-slate-300 leading-snug">Full-stack Product Manager · 9 yrs in e-commerce (pricing, conversion, growth) · Expert in shipping end-to-end AI-powered products · DM on LinkedIn for interesting conversations</p>
           </div>
           <a href="https://www.linkedin.com/in/arushii-gupta-1a33b112/" target="_blank" rel="noopener noreferrer" className="shrink-0 rounded-lg bg-primary px-5 py-2 text-sm font-bold text-white hover:opacity-90 transition-opacity">LinkedIn</a>
         </div>
