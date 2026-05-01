@@ -38,12 +38,11 @@ export default async function Home() {
           ))}
         </div>
 
-        {/* Sign in reason */}
-        {!session && (
-          <p className="mb-3 text-center text-sm text-slate-300">
-            🔐 We use sign-in to prevent abuse and keep your results private.
-          </p>
-        )}
+<p className="mb-3 text-center text-sm text-slate-300">
+  {session
+    ? `✅ Signed in as ${session.user?.email}`
+    : "🔐 We use sign-in to prevent abuse and keep your results private."}
+</p>
 
 <div className="w-full mb-20">
   <CVFormWrapper isSignedIn={!!session} />
