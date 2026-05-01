@@ -40,7 +40,7 @@ export default async function Home() {
 
 <p className="mb-3 text-center text-sm text-slate-300">
   {session
-    ? `✅ Signed in as ${session.user?.email}`
+    ? `✅ Signed in with ${session.user?.email}`
     : "🔐 We use sign-in to prevent abuse and keep your results private."}
 </p>
 
