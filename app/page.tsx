@@ -5,11 +5,10 @@ export default async function Home() {
   const session = await auth()
 
   return (
-    <div className="flex flex-col items-center px-4 pt-6 pb-0">
+    <div className="flex flex-col items-center px-4 pt-2 pb-0">
       <div className="w-full max-w-3xl flex flex-col items-center">
-
-        <div className="text-center mb-6 w-full">
-          <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-[8px] font-bold uppercase tracking-wider mb-3">
+        <div className="text-center mb-4 w-full">
+          <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-[8px] font-bold uppercase tracking-wider mb-2">
             AI Engine Active
           </div>
           <h1 className="text-xl md:text-3xl font-extrabold tracking-tight mb-1">
@@ -21,11 +20,9 @@ export default async function Home() {
               : "Connect your Google account to start tailoring your resume with precision AI analysis."}
           </p>
         </div>
-
         <div className="w-full">
           <CVFormWrapper isSignedIn={!!session} />
         </div>
-
       </div>
     </div>
   )
