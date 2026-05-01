@@ -77,7 +77,7 @@ export function CVForm({ isSignedIn, onSignIn }: CVFormProps) {
 
   return (
     <div className="relative w-full">
-      <div className={`relative rounded-2xl border border-[var(--border)] bg-[var(--card)] p-8 shadow-2xl transition-all duration-300 ${!isSignedIn ? "overflow-hidden" : ""}`}>
+      <div className={`relative rounded-2xl border border-[var(--border)] bg-[var(--card)] p-4 shadow-2xl transition-all duration-300 ${!isSignedIn ? "overflow-hidden" : ""}`}>
         <form onSubmit={handleSubmit} noValidate>
 
           <div className="mb-6">
@@ -101,7 +101,7 @@ export function CVForm({ isSignedIn, onSignIn }: CVFormProps) {
                 <button type="button" onClick={removeFile} className="rounded-lg p-1 text-[var(--text-subtle)] hover:text-foreground"><X className="h-4 w-4" /></button>
               </div>
             ) : (
-              <label htmlFor="cv-upload" onDrop={handleDrop} onDragOver={handleDragOver} onDragLeave={handleDragLeave} className={`flex cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed px-6 py-10 text-center transition-all duration-200 ${isDragging ? "border-primary bg-primary/10" : "border-white/30 bg-[var(--navy-surface)] hover:border-primary/70"} ${!isSignedIn ? "pointer-events-none opacity-50" : ""}`}>
+              <label htmlFor="cv-upload" onDrop={handleDrop} onDragOver={handleDragOver} onDragLeave={handleDragLeave} className={`flex cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed px-6 py-4 text-center transition-all duration-200 ${isDragging ? "border-primary bg-primary/10" : "border-white/30 bg-[var(--navy-surface)] hover:border-primary/70"} ${!isSignedIn ? "pointer-events-none opacity-50" : ""}`}>
                 <div className={`flex h-12 w-12 items-center justify-center rounded-full ${isDragging ? "bg-primary/20" : "bg-[var(--navy-elevated)]"}`}>
                   <Upload className={`h-5 w-5 ${isDragging ? "text-primary" : "text-[var(--text-muted)]"}`} />
                 </div>
