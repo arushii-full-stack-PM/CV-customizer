@@ -11,7 +11,7 @@ export function SiteFooter() {
           <div className="flex flex-col">
             <p className="text-[9px] font-bold uppercase tracking-widest text-primary">Created & Maintained by</p>
             <p className="text-xs font-bold text-white">Arushii Gupta</p>
-            <p className="text-[10px] text-slate-300 leading-snug">Full-stack Product Manager · 9 yrs in e-commerce · Expert in shipping end-to-end AI-powered products · DM on LinkedIn for interesting conversations</p>
+            <p className="text-[12px] text-slate-300 leading-snug">Full-stack Product Manager · 9 yrs in e-commerce · Expert in shipping end-to-end AI-powered products · DM on LinkedIn for interesting conversations</p>
           </div>
         </div>
 
