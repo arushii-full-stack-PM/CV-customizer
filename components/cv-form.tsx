@@ -90,7 +90,7 @@ export function CVForm({ isSignedIn, onSignIn }: CVFormProps) {
             <label className="mb-2 block text-sm font-semibold text-foreground">Upload Your CV <span className="font-normal text-[var(--text-subtle)]">(PDF only)</span></label>
             <input ref={fileInputRef} id="cv-upload" type="file" accept=".pdf,application/pdf" onChange={handleInputChange} disabled={!isSignedIn} className="sr-only" />
             {uploadedFile ? (
-              <div className="flex items-center justify-between rounded-xl border border-primary/40 bg-primary/10 px-4 py-3.5 w-full">
+              <div className="flex items-center justify-between rounded-xl border border-primary/40 bg-primary/10 px-4 py-3.5 w-full min-h-[120px]">
                 <div className="flex items-center gap-3">
                   <FileCheck className="h-5 w-5 shrink-0 text-primary" />
                   <div>
