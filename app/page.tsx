@@ -31,7 +31,7 @@ export default async function Home() {
         {/* Trust signals */}
         <div className="mb-3 flex flex-wrap items-center justify-center gap-2">
           {TRUST_SIGNALS.map((signal) => (
-            <div key={signal.text} className="flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[10px] text-slate-300">
+            <div key={signal.text} className="flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-sm text-slate-200">
               <span>{signal.icon}</span>
               <span>{signal.text}</span>
             </div>
@@ -40,7 +40,7 @@ export default async function Home() {
 
         {/* Sign in reason */}
         {!session && (
-          <p className="mb-3 text-center text-[10px] text-slate-400">
+          <p className="mb-3 text-center text-sm text-slate-300">
             🔐 We use sign-in to prevent abuse and keep your results private.
           </p>
         )}
