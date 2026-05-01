@@ -29,7 +29,7 @@ export default async function Home() {
         </div>
 
         {/* Trust signals */}
-        <div className="mb-3 flex flex-wrap items-center justify-center gap-2">
+        <div className="mb-5 flex flex-wrap items-center justify-center gap-2">
           {TRUST_SIGNALS.map((signal) => (
             <div key={signal.text} className="flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-sm text-slate-200">
               <span>{signal.icon}</span>
