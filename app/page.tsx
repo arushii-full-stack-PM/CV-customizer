@@ -31,13 +31,14 @@ export default async function Home() {
                 <input type="text" placeholder="Paste link here..." className="w-full bg-slate-950 border border-border p-2.5 rounded-lg text-xs outline-none" />
               </div>
 
-              <div>
-                <label className="text-[9px] font-bold uppercase tracking-widest text-text-subtle mb-1.5 block">Resume Submission</label>
-                <div className="border border-dashed border-border rounded-lg py-6 flex flex-col items-center justify-center bg-slate-950/50 cursor-pointer">
-                  <svg className="w-5 h-5 text-text-subtle mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
-                  <span className="text-[9px] font-bold text-text-subtle uppercase">Upload PDF Resume</span>
-                </div>
-              </div>
+<div>
+  <label className="text-[9px] font-bold uppercase tracking-widest text-text-subtle mb-1.5 block">Resume Submission</label>
+  <input id="cv-file" type="file" accept=".pdf,application/pdf" className="sr-only" />
+  <label htmlFor="cv-file" className="border border-dashed border-border rounded-lg py-6 flex flex-col items-center justify-center bg-slate-950/50 cursor-pointer hover:border-primary transition-colors">
+    <svg className="w-5 h-5 text-text-subtle mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
+    <span className="text-[9px] font-bold text-text-subtle uppercase">Upload PDF Resume</span>
+  </label>
+</div>
 
               <button disabled={!session} className={`w-full py-2.5 rounded-lg font-bold text-xs ${session ? 'bg-primary text-black' : 'bg-disabled-button-bg text-disabled-button-text'}`}>
                 {session ? "Analyze Now →" : "Sign in to Analyze"}
