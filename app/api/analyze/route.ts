@@ -26,6 +26,10 @@ STRICT QUALITY CONSTRAINTS:
 2. Every matched keyword must be explicitly present in the CV text
 3. If a skill is not explicitly found, it is missing — do not assume
 4. Do not mark something as missing if any variation of it appears in the CV
+5. Keep each string value under 100 characters to avoid truncation
+6. Limit matchedKeywords and missingKeywords to 8 items each maximum
+7. Limit skillsGap to 5 items maximum
+8. Limit suggestedRewrites to 3 items maximum
 
 Job Description:
 ${jdText}
