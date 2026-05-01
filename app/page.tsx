@@ -18,7 +18,7 @@ export default async function Home() {
           <div className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-[8px] font-bold uppercase tracking-wider mb-2">
             AI Engine Active
           </div>
-          <h1 className="text-xl md:text-3xl font-extrabold tracking-tight mb-2">
+          <h1 className="text-xl md:text-3xl font-extrabold tracking-tight mb-3">
             Tailor your CV to <span className="text-primary">every opportunity.</span>
           </h1>
           <p className="text-text-muted text-[10px] sm:text-xs opacity-80">
