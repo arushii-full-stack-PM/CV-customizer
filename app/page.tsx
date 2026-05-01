@@ -45,7 +45,7 @@ export default async function Home() {
           </p>
         )}
 
-<div className="w-full mb-4">
+<div className="w-full mb-20">
   <CVFormWrapper isSignedIn={!!session} />
 </div>
 
