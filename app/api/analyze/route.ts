@@ -39,7 +39,7 @@ Return this exact JSON structure:
     { "original": "<existing CV bullet>", "rewritten": "<improved version>" }
   ],
   "redFlags": [<list of things that may hurt shortlisting chances>],
-  "quickWins": [<top 3 specific changes to improve match score>]
+  "quickWins": [<top 5 specific changes to improve match score in the order of importance>]
 }`,
         },
       ],
