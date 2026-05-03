@@ -20,7 +20,8 @@ export function CVForm({ isSignedIn, onSignIn }: CVFormProps) {
   const handleFile = useCallback((file: File | null | undefined) => {
     setFileError("")
     if (!file) return
-    if (file.type !== "application/pdf") { setFileError("Only PDF files are accepted."); return }
+   const allowed = ["application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"]
+if (!allowed.includes(file.type)) { setFileError("Only PDF or Word (.docx) files are accepted."); return }
     if (file.size > 10 * 1024 * 1024) { setFileError("File must be under 10 MB."); return }
     setUploadedFile(file)
   }, [])
@@ -88,7 +89,7 @@ export function CVForm({ isSignedIn, onSignIn }: CVFormProps) {
 
           <div className="mb-8">
             <label className="mb-2 block text-sm font-semibold text-foreground">Upload Your CV <span className="font-normal text-[var(--text-subtle)]">(PDF only)</span></label>
-            <input ref={fileInputRef} id="cv-upload" type="file" accept=".pdf,application/pdf" onChange={handleInputChange} disabled={!isSignedIn} className="sr-only" />
+          <input ref={fileInputRef} id="cv-upload" type="file" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" onChange={handleInputChange} disabled={!isSignedIn} className="sr-only" />
             {uploadedFile ? (
               <div className="flex items-center justify-between rounded-xl border border-primary/40 bg-primary/10 px-4 py-3.5 w-full min-h-[120px]">
                 <div className="flex items-center gap-3">
@@ -107,7 +108,7 @@ export function CVForm({ isSignedIn, onSignIn }: CVFormProps) {
                 </div>
                 <div>
                   <p className="text-sm font-medium text-foreground">Drag &amp; drop your PDF here <span className="text-[var(--text-subtle)]">or</span> <span className="text-primary hover:underline">click to browse</span></p>
-                  <p className="mt-1 text-xs text-[var(--text-subtle)]">PDF files only · max 10 MB</p>
+                 <p className="mt-1 text-xs text-[var(--text-subtle)]">PDF or Word (.docx) · max 10 MB</p>
                 </div>
               </label>
             )}
