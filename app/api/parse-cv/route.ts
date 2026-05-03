@@ -15,18 +15,18 @@ export async function POST(req: NextRequest) {
     const isDocx = file.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" || file.name.endsWith(".docx")
 
     let text = ""
+    let pageCount = 1
 
     if (isPdf) {
       const parsed = await pdfParse(buffer)
       text = parsed.text
+      pageCount = parsed.numpages || 1
     } else if (isDocx) {
-      // Extract text from docx by reading the XML inside the zip
       const JSZip = (await import("jszip")).default
       const zip = await JSZip.loadAsync(buffer)
       const xmlFile = zip.file("word/document.xml")
       if (!xmlFile) throw new Error("Invalid docx file")
       const xml = await xmlFile.async("text")
-      // Strip XML tags to get plain text
       text = xml
         .replace(/<w:br[^>]*\/>/gi, "\n")
         .replace(/<w:p[ >][^>]*>/gi, "\n")
@@ -37,11 +37,25 @@ export async function POST(req: NextRequest) {
         .replace(/&quot;/g, '"')
         .replace(/\n{3,}/g, "\n\n")
         .trim()
+      // Estimate pages for docx: ~4000 chars per page
+      pageCount = Math.max(1, Math.ceil(text.length / 4000))
     } else {
       return NextResponse.json({ error: "Unsupported file type" }, { status: 400 })
     }
 
-    return NextResponse.json({ text: text.slice(0, 8000) })
+    const extractedChars = text.length
+    const expectedChars = pageCount * 3000
+    const parsePercent = Math.min(100, Math.round((extractedChars / expectedChars) * 100))
+
+    return NextResponse.json({
+      text: text.slice(0, 8000),
+      parseStats: {
+        extractedChars,
+        pageCount,
+        parsePercent,
+        isPdf,
+      }
+    })
   } catch (error) {
     console.error("Parse error:", error)
     return NextResponse.json({ error: "Failed to parse file" }, { status: 500 })
