@@ -1,14 +1,36 @@
 import { NextRequest, NextResponse } from "next/server"
 import Anthropic from "@anthropic-ai/sdk"
+import { checkIpLimit, checkEmailLimit, getIp } from "@/lib/rate-limit"
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
 export async function POST(req: NextRequest) {
   try {
+    const ip = getIp(req)
+
+    // Layer 1: IP rate limit — 10 requests per hour
+    const ipCheck = await checkIpLimit(ip, "analyze", 10, 3600)
+    if (!ipCheck.allowed) {
+      return NextResponse.json({
+        error: "Too many requests from your network. Please try again in an hour."
+      }, { status: 429 })
+    }
+
     const { jdText, cvText, email } = await req.json()
 
     if (!jdText || !cvText) {
       return NextResponse.json({ error: "JD and CV text are required" }, { status: 400 })
+    }
+
+    // Layer 2: Email rate limit — 2 analyses per email
+    if (email) {
+      const emailCheck = await checkEmailLimit(email, 2)
+      if (!emailCheck.allowed) {
+        return NextResponse.json({
+          error: "You have used your 2 free analyses. DM Arushii on LinkedIn for more access.",
+          limitReached: true
+        }, { status: 429 })
+      }
     }
 
     const message = await client.messages.create({
@@ -101,11 +123,9 @@ Return EXACTLY this JSON structure with no deviations:
     const clean = rawText.replace(/```json|```/g, "").trim()
     const result = JSON.parse(clean)
 
-    // Validate matchScore matches breakdown
     if (result.scoreBreakdown) {
       const { mustHaveSkills, experienceMatch, niceToHave, domainFit } = result.scoreBreakdown
       const calculatedScore = (mustHaveSkills || 0) + (experienceMatch || 0) + (niceToHave || 0) + (domainFit || 0)
-      // If breakdown doesn't add up to matchScore, use calculated score
       if (Math.abs(calculatedScore - result.matchScore) > 5) {
         result.matchScore = calculatedScore
       }
