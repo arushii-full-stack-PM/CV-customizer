@@ -1,8 +1,17 @@
 import { NextRequest, NextResponse } from "next/server"
 import pdfParse from "pdf-parse"
+import { checkIpLimit, getIp } from "@/lib/rate-limit"
 
 export async function POST(req: NextRequest) {
   try {
+    const ip = getIp(req)
+    const ipCheck = await checkIpLimit(ip, "parse-cv", 20, 3600)
+    if (!ipCheck.allowed) {
+      return NextResponse.json({
+        error: "Too many requests. Please try again in an hour."
+      }, { status: 429 })
+    }
+
     const formData = await req.formData()
     const file = formData.get("file") as File
 
@@ -37,7 +46,6 @@ export async function POST(req: NextRequest) {
         .replace(/&quot;/g, '"')
         .replace(/\n{3,}/g, "\n\n")
         .trim()
-      // Estimate pages for docx: ~4000 chars per page
       pageCount = Math.max(1, Math.ceil(text.length / 4000))
     } else {
       return NextResponse.json({ error: "Unsupported file type" }, { status: 400 })
@@ -49,12 +57,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       text: text.slice(0, 8000),
-      parseStats: {
-        extractedChars,
-        pageCount,
-        parsePercent,
-        isPdf,
-      }
+      parseStats: { extractedChars, pageCount, parsePercent, isPdf }
     })
   } catch (error) {
     console.error("Parse error:", error)
