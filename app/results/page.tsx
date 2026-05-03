@@ -1,6 +1,13 @@
 "use client"
 import { useState, useEffect } from "react"
-import { CheckCircle2, XCircle, AlertTriangle, Zap, BarChart2, FileText } from "lucide-react"
+import { CheckCircle2, XCircle, AlertTriangle, Zap, BarChart2, FileText, Copy, Check } from "lucide-react"
+
+interface ParseStats {
+  extractedChars: number
+  pageCount: number
+  parsePercent: number
+  isPdf: boolean
+}
 
 interface AnalysisResult {
   matchScore: number
@@ -24,20 +31,12 @@ function ScoreRing({ score }: { score: number }) {
   const radius = 54
   const circumference = 2 * Math.PI * radius
   const offset = circumference - (score / 100) * circumference
-
   return (
     <div className="flex flex-col items-center gap-3 py-6">
       <div className="relative flex items-center justify-center">
         <svg width="140" height="140" className="-rotate-90">
           <circle cx="70" cy="70" r={radius} fill="none" stroke="#1e293b" strokeWidth="10" />
-          <circle
-            cx="70" cy="70" r={radius} fill="none"
-            stroke={color} strokeWidth="10"
-            strokeDasharray={circumference}
-            strokeDashoffset={offset}
-            strokeLinecap="round"
-            style={{ transition: "stroke-dashoffset 1s ease" }}
-          />
+          <circle cx="70" cy="70" r={radius} fill="none" stroke={color} strokeWidth="10" strokeDasharray={circumference} strokeDashoffset={offset} strokeLinecap="round" style={{ transition: "stroke-dashoffset 1s ease" }} />
         </svg>
         <div className="absolute flex flex-col items-center">
           <span className="text-4xl font-bold text-foreground">{score}%</span>
@@ -45,11 +44,7 @@ function ScoreRing({ score }: { score: number }) {
       </div>
       <p className="text-lg font-semibold text-[var(--text-muted)]">Match Score</p>
       <p className="text-sm text-[var(--text-subtle)]">
-        {score >= 75
-          ? "🟢 Strong match — a few tweaks and you're set!"
-          : score >= 40
-          ? "🟡 Moderate match — some gaps to address"
-          : "🔴 Low match — significant changes recommended"}
+        {score >= 75 ? "🟢 Strong match — a few tweaks and you're set!" : score >= 40 ? "🟡 Moderate match — some gaps to address" : "🔴 Low match — significant changes recommended"}
       </p>
     </div>
   )
@@ -62,7 +57,6 @@ function ScoreBreakdown({ breakdown }: { breakdown: NonNullable<AnalysisResult["
     { label: "Nice-to-haves", score: breakdown.niceToHave, max: 10 },
     { label: "Domain Fit", score: breakdown.domainFit, max: 10 },
   ]
-
   return (
     <div className="rounded-2xl border border-white/10 bg-white/5 p-6 mb-8">
       <h2 className="font-semibold text-foreground mb-5">Score Breakdown</h2>
@@ -92,23 +86,106 @@ function ScoreBreakdown({ breakdown }: { breakdown: NonNullable<AnalysisResult["
   )
 }
 
+function JdUrlBar({ url, fileName, parseStats }: { url: string; fileName: string; parseStats: ParseStats | null }) {
+  const [copied, setCopied] = useState(false)
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(url)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
+  const parseColor = parseStats
+    ? parseStats.parsePercent >= 80 ? "text-green-400" : parseStats.parsePercent >= 50 ? "text-yellow-400" : "text-red-400"
+    : "text-[var(--text-muted)]"
+
+  const parseBarColor = parseStats
+    ? parseStats.parsePercent >= 80 ? "bg-green-400" : parseStats.parsePercent >= 50 ? "bg-yellow-400" : "bg-red-400"
+    : "bg-primary"
+
+  const parseLabel = parseStats
+    ? parseStats.parsePercent >= 80 ? "Good — results are reliable" : parseStats.parsePercent >= 50 ? "Moderate — some content may be missed" : "Low — consider saving CV as plain PDF"
+    : ""
+
+  const truncatedUrl = url.length > 60 ? url.slice(0, 60) + "..." : url
+
+  return (
+    <div className="rounded-2xl border border-white/10 bg-white/5 p-5 mb-6 flex flex-col gap-4">
+
+      {/* JD URL row */}
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex flex-col gap-0.5 min-w-0">
+          <p className="text-xs font-semibold uppercase tracking-widest text-[var(--text-muted)]">Analyzing against</p>
+          <p className="text-sm text-primary truncate" title={url}>{truncatedUrl}</p>
+        </div>
+        <button onClick={handleCopy} className="shrink-0 flex items-center gap-1.5 rounded-lg border border-white/10 px-3 py-1.5 text-xs text-[var(--text-muted)] hover:text-foreground hover:border-white/30 transition-all">
+          {copied ? <><Check className="h-3.5 w-3.5 text-green-400" />Copied!</> : <><Copy className="h-3.5 w-3.5" />Copy URL</>}
+        </button>
+      </div>
+
+      {/* Divider */}
+      <div className="border-t border-white/10" />
+
+      {/* File + parse stats row */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-[var(--text-muted)]">📄</span>
+          <span className="text-sm text-foreground font-medium">{fileName}</span>
+          {parseStats && (
+            <span className="text-xs text-[var(--text-muted)]">· {parseStats.pageCount} {parseStats.pageCount === 1 ? "page" : "pages"}</span>
+          )}
+        </div>
+        {parseStats && (
+          <div className="flex items-center gap-3">
+            <div className="flex flex-col gap-1 min-w-[140px]">
+              <div className="flex justify-between text-xs">
+                <span className="text-[var(--text-muted)]">Content parsed</span>
+                <span className={`font-bold ${parseColor}`}>{parseStats.parsePercent}%</span>
+              </div>
+              <div className="h-1.5 rounded-full bg-white/10 overflow-hidden">
+                <div className={`h-1.5 rounded-full transition-all duration-700 ${parseBarColor}`} style={{ width: `${parseStats.parsePercent}%` }} />
+              </div>
+            </div>
+            <span className={`text-xs ${parseColor} hidden sm:block`}>{parseLabel}</span>
+          </div>
+        )}
+      </div>
+
+      {/* Parse warning if low */}
+      {parseStats && parseStats.parsePercent < 50 && (
+        <div className="rounded-lg bg-red-500/10 border border-red-500/20 px-4 py-2 text-xs text-red-400">
+          ⚠️ Less than 50% of your CV was extracted. Your PDF may be image-based or heavily formatted. For better results, save your CV as a plain PDF from Word or Google Docs.
+        </div>
+      )}
+
+    </div>
+  )
+}
+
 export default function ResultsPage() {
   const [data, setData] = useState<AnalysisResult | null>(null)
   const [expandedRewrite, setExpandedRewrite] = useState<number | null>(null)
   const [notFound, setNotFound] = useState(false)
+  const [jdUrl, setJdUrl] = useState("")
+  const [fileName, setFileName] = useState("")
+  const [parseStats, setParseStats] = useState<ParseStats | null>(null)
 
- useEffect(() => {
-  const stored = sessionStorage.getItem("cvAnalysis")
-  if (stored) {
-    try {
-      setData(JSON.parse(stored))
-    } catch {
+  useEffect(() => {
+    const stored = sessionStorage.getItem("cvAnalysis")
+    if (stored) {
+      try {
+        setData(JSON.parse(stored))
+        setJdUrl(sessionStorage.getItem("cvJdUrl") || "")
+        setFileName(sessionStorage.getItem("cvFileName") || "")
+        const stats = sessionStorage.getItem("cvParseStats")
+        if (stats) setParseStats(JSON.parse(stats))
+      } catch {
+        setNotFound(true)
+      }
+    } else {
       setNotFound(true)
     }
-  } else {
-    setNotFound(true)
-  }
-}, [])
+  }, [])
 
   if (notFound) {
     return (
@@ -136,9 +213,14 @@ export default function ResultsPage() {
       <div className="w-full max-w-5xl">
 
         {/* Back link */}
-        <div className="mb-6">
+        <div className="mb-4">
           <a href="/" className="text-sm text-primary hover:underline">← Analyze Another</a>
         </div>
+
+        {/* JD URL + File + Parse Stats */}
+        {(jdUrl || fileName) && (
+          <JdUrlBar url={jdUrl} fileName={fileName} parseStats={parseStats} />
+        )}
 
         {/* Score Ring */}
         <div className="rounded-2xl border border-white/10 bg-white/5 p-6 mb-8">
@@ -151,7 +233,6 @@ export default function ResultsPage() {
         {/* 6 Cards */}
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
 
-          {/* Matched Keywords */}
           <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
             <div className="flex items-center gap-2 mb-4">
               <CheckCircle2 className="text-green-400 h-5 w-5" />
@@ -164,7 +245,6 @@ export default function ResultsPage() {
             </div>
           </div>
 
-          {/* Missing Keywords */}
           <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
             <div className="flex items-center gap-2 mb-4">
               <XCircle className="text-red-400 h-5 w-5" />
@@ -177,7 +257,6 @@ export default function ResultsPage() {
             </div>
           </div>
 
-          {/* Skills Gap */}
           <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
             <div className="flex items-center gap-2 mb-4">
               <BarChart2 className="text-primary h-5 w-5" />
@@ -201,7 +280,6 @@ export default function ResultsPage() {
             </table>
           </div>
 
-          {/* Suggested Rewrites */}
           <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
             <div className="flex items-center gap-2 mb-4">
               <FileText className="text-primary h-5 w-5" />
@@ -210,23 +288,17 @@ export default function ResultsPage() {
             <div className="flex flex-col gap-3">
               {data.suggestedRewrites.map((item, i) => (
                 <div key={i} className="rounded-lg border border-white/10 overflow-hidden">
-                  <button
-                    className="w-full text-left px-4 py-3 text-sm text-[var(--text-muted)] hover:bg-white/5"
-                    onClick={() => setExpandedRewrite(expandedRewrite === i ? null : i)}
-                  >
+                  <button className="w-full text-left px-4 py-3 text-sm text-[var(--text-muted)] hover:bg-white/5" onClick={() => setExpandedRewrite(expandedRewrite === i ? null : i)}>
                     <span className="line-clamp-1">{item.original}</span>
                   </button>
                   {expandedRewrite === i && (
-                    <div className="px-4 py-3 bg-primary/10 border-t border-white/10 text-sm text-primary">
-                      ✍️ {item.rewritten}
-                    </div>
+                    <div className="px-4 py-3 bg-primary/10 border-t border-white/10 text-sm text-primary">✍️ {item.rewritten}</div>
                   )}
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Red Flags */}
           <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
             <div className="flex items-center gap-2 mb-4">
               <AlertTriangle className="text-yellow-400 h-5 w-5" />
@@ -242,7 +314,6 @@ export default function ResultsPage() {
             </ul>
           </div>
 
-          {/* Quick Wins */}
           <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
             <div className="flex items-center gap-2 mb-4">
               <Zap className="text-primary h-5 w-5" />
