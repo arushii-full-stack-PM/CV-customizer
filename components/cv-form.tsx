@@ -66,8 +66,10 @@ if (!allowed.includes(file.type)) { setFileError("Only PDF or Word (.docx) files
       const analysisData = await analysisRes.json()
       if (!analysisData.matchScore) throw new Error("Analysis failed")
 
-      sessionStorage.setItem("cvAnalysis", JSON.stringify(analysisData))
-      window.location.href = "/results"
+sessionStorage.removeItem("cvAnalysis")
+sessionStorage.setItem("cvAnalysis", JSON.stringify(analysisData))
+sessionStorage.setItem("cvAnalysisTimestamp", Date.now().toString())
+window.location.href = "/results"
     } catch (error) {
       console.error(error)
       setAnalysisError("Something went wrong. Please try again.")
@@ -107,8 +109,8 @@ if (!allowed.includes(file.type)) { setFileError("Only PDF or Word (.docx) files
                   <Upload className={`h-5 w-5 ${isDragging ? "text-primary" : "text-[var(--text-muted)]"}`} />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-foreground">Drag &amp; drop your PDF here <span className="text-[var(--text-subtle)]">or</span> <span className="text-primary hover:underline">click to browse</span></p>
-                 <p className="mt-1 text-xs text-[var(--text-subtle)]">PDF or Word (.docx) · max 10 MB</p>
+                  <p className="text-sm font-medium text-foreground">Drag &amp; drop your resume here <span className="text-[var(--text-subtle)]">or</span> <span className="text-primary hover:underline">click to browse</span></p>
+                <p className="mt-1 text-xs text-[var(--text-subtle)]">PDF or Word (.docx) · max 10 MB</p>
                 </div>
               </label>
             )}
