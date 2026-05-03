@@ -97,19 +97,18 @@ export default function ResultsPage() {
   const [expandedRewrite, setExpandedRewrite] = useState<number | null>(null)
   const [notFound, setNotFound] = useState(false)
 
-  useEffect(() => {
-    const stored = sessionStorage.getItem("cvAnalysis")
-    const timestamp = sessionStorage.getItem("cvAnalysisTimestamp")
-    const isStale = !timestamp || (Date.now() - parseInt(timestamp)) > 3600000
-
-    if (stored && !isStale) {
+ useEffect(() => {
+  const stored = sessionStorage.getItem("cvAnalysis")
+  if (stored) {
+    try {
       setData(JSON.parse(stored))
-    } else {
-      sessionStorage.removeItem("cvAnalysis")
-      sessionStorage.removeItem("cvAnalysisTimestamp")
+    } catch {
       setNotFound(true)
     }
-  }, [])
+  } else {
+    setNotFound(true)
+  }
+}, [])
 
   if (notFound) {
     return (
