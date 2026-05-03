@@ -1,9 +1,17 @@
 import { NextRequest, NextResponse } from "next/server"
+import { checkIpLimit, getIp } from "@/lib/rate-limit"
 
 export async function POST(req: NextRequest) {
   try {
-    const { url } = await req.json()
+    const ip = getIp(req)
+    const ipCheck = await checkIpLimit(ip, "scrape-jd", 20, 3600)
+    if (!ipCheck.allowed) {
+      return NextResponse.json({
+        error: "Too many requests. Please try again in an hour."
+      }, { status: 429 })
+    }
 
+    const { url } = await req.json()
     if (!url) {
       return NextResponse.json({ error: "URL is required" }, { status: 400 })
     }
@@ -19,15 +27,13 @@ export async function POST(req: NextRequest) {
     }
 
     const html = await response.text()
-
-    // Strip HTML tags to get plain text
     const text = html
       .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "")
       .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "")
       .replace(/<[^>]+>/g, " ")
       .replace(/\s+/g, " ")
       .trim()
-      .slice(0, 8000) // Limit to 8000 chars to stay within Claude limits
+      .slice(0, 8000)
 
     return NextResponse.json({ text })
   } catch (error) {
