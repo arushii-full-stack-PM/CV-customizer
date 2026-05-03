@@ -16,11 +16,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="bg-background">
-      <body className={`${geist.variable} ${geistMono.variable} font-sans antialiased bg-background text-foreground`}>
+      <body className={`${geist.variable} ${geistMono.variable} font-sans antialiased bg-background text-foreground min-h-screen flex flex-col`}>
         <Providers>
           <Navbar />
-          {/* REMOVED: min-h-screen and flex-grow wrapper */}
-          <main>
+          <main className="flex-1">
             {children}
           </main>
           <SiteFooter />
