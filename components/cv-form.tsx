@@ -4,10 +4,11 @@ import { Lock, Upload, FileCheck, X, ArrowRight } from "lucide-react"
 
 interface CVFormProps {
   isSignedIn: boolean
+  email?: string
   onSignIn: () => void
 }
 
-export function CVForm({ isSignedIn, onSignIn }: CVFormProps) {
+export function CVForm({ isSignedIn, email = "", onSignIn }: CVFormProps) {
   const [jdUrl, setJdUrl] = useState("")
   const [uploadedFile, setUploadedFile] = useState<File | null>(null)
   const [isDragging, setIsDragging] = useState(false)
@@ -20,8 +21,11 @@ export function CVForm({ isSignedIn, onSignIn }: CVFormProps) {
   const handleFile = useCallback((file: File | null | undefined) => {
     setFileError("")
     if (!file) return
-   const allowed = ["application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"]
-if (!allowed.includes(file.type)) { setFileError("Only PDF or Word (.docx) files are accepted."); return }
+    const allowed = ["application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"]
+    if (!allowed.includes(file.type) && !file.name.endsWith(".pdf") && !file.name.endsWith(".docx")) {
+      setFileError("Only PDF or Word (.docx) files are accepted.")
+      return
+    }
     if (file.size > 10 * 1024 * 1024) { setFileError("File must be under 10 MB."); return }
     setUploadedFile(file)
   }, [])
@@ -45,31 +49,39 @@ if (!allowed.includes(file.type)) { setFileError("Only PDF or Word (.docx) files
     e.preventDefault()
     let valid = true
     if (!jdUrl.trim()) { setUrlError("Please enter a job description URL."); valid = false } else { setUrlError("") }
-    if (!uploadedFile) { setFileError("Please upload your CV as a PDF."); valid = false }
+    if (!uploadedFile) { setFileError("Please upload your CV."); valid = false }
     if (!valid) return
 
     setIsLoading(true)
     setAnalysisError("")
 
     try {
+      // Step 1: Parse CV
       const formData = new FormData()
       formData.append("file", uploadedFile!)
       const cvRes = await fetch("/api/parse-cv", { method: "POST", body: formData })
       const cvData = await cvRes.json()
       if (!cvData.text) throw new Error("Failed to parse CV")
 
+      // Step 2: Scrape JD
       const jdRes = await fetch("/api/scrape-jd", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ url: jdUrl }) })
       const jdData = await jdRes.json()
       if (!jdData.text) throw new Error("Failed to fetch job description")
 
-      const analysisRes = await fetch("/api/analyze", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ jdText: jdData.text, cvText: cvData.text }) })
+      // Step 3: Analyze
+      const analysisRes = await fetch("/api/analyze", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ jdText: jdData.text, cvText: cvData.text, email }) })
       const analysisData = await analysisRes.json()
       if (!analysisData.matchScore) throw new Error("Analysis failed")
 
-sessionStorage.removeItem("cvAnalysis")
-sessionStorage.setItem("cvAnalysis", JSON.stringify(analysisData))
-sessionStorage.setItem("cvAnalysisTimestamp", Date.now().toString())
-window.location.href = "/results"
+      // Step 4: Store everything and redirect
+      sessionStorage.removeItem("cvAnalysis")
+      sessionStorage.setItem("cvAnalysis", JSON.stringify(analysisData))
+      sessionStorage.setItem("cvAnalysisTimestamp", Date.now().toString())
+      sessionStorage.setItem("cvJdUrl", jdUrl)
+      sessionStorage.setItem("cvFileName", uploadedFile!.name)
+      sessionStorage.setItem("cvParseStats", JSON.stringify(cvData.parseStats || {}))
+      window.location.href = "/results"
+
     } catch (error) {
       console.error(error)
       setAnalysisError("Something went wrong. Please try again.")
@@ -89,11 +101,11 @@ window.location.href = "/results"
             {urlError && <p className="mt-1.5 text-xs text-red-400">{urlError}</p>}
           </div>
 
-          <div className="mb-8">
-            <label className="mb-2 block text-sm font-semibold text-foreground">Upload Your CV <span className="font-normal text-[var(--text-subtle)]">(PDF only)</span></label>
-          <input ref={fileInputRef} id="cv-upload" type="file" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" onChange={handleInputChange} disabled={!isSignedIn} className="sr-only" />
+          <div className="mb-6">
+            <label className="mb-2 block text-sm font-semibold text-foreground">Upload Your CV <span className="font-normal text-[var(--text-subtle)]">(PDF or Word)</span></label>
+            <input ref={fileInputRef} id="cv-upload" type="file" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" onChange={handleInputChange} disabled={!isSignedIn} className="sr-only" />
             {uploadedFile ? (
-              <div className="flex items-center justify-between rounded-xl border border-primary/40 bg-primary/10 px-4 py-3.5 w-full min-h-[120px]">
+              <div className="flex items-center justify-between rounded-xl border border-primary/40 bg-primary/10 px-4 w-full min-h-[120px]">
                 <div className="flex items-center gap-3">
                   <FileCheck className="h-5 w-5 shrink-0 text-primary" />
                   <div>
@@ -104,13 +116,13 @@ window.location.href = "/results"
                 <button type="button" onClick={removeFile} className="rounded-lg p-1 text-[var(--text-subtle)] hover:text-foreground"><X className="h-4 w-4" /></button>
               </div>
             ) : (
-              <label htmlFor="cv-upload" onDrop={handleDrop} onDragOver={handleDragOver} onDragLeave={handleDragLeave} className={`flex cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed px-6 py-4 min-h-[120px] text-center transition-all duration-200 ${isDragging ? "border-primary bg-primary/10" : "border-white/30 bg-[var(--navy-surface)] hover:border-primary/70"} ${!isSignedIn ? "pointer-events-none opacity-50" : ""}`}>
+              <label htmlFor="cv-upload" onDrop={handleDrop} onDragOver={handleDragOver} onDragLeave={handleDragLeave} className={`flex cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed px-6 text-center transition-all duration-200 min-h-[120px] ${isDragging ? "border-primary bg-primary/10" : "border-white/30 bg-[var(--navy-surface)] hover:border-primary/70"} ${!isSignedIn ? "pointer-events-none opacity-50" : ""}`}>
                 <div className={`flex h-12 w-12 items-center justify-center rounded-full ${isDragging ? "bg-primary/20" : "bg-[var(--navy-elevated)]"}`}>
                   <Upload className={`h-5 w-5 ${isDragging ? "text-primary" : "text-[var(--text-muted)]"}`} />
                 </div>
                 <div>
                   <p className="text-sm font-medium text-foreground">Drag &amp; drop your resume here <span className="text-[var(--text-subtle)]">or</span> <span className="text-primary hover:underline">click to browse</span></p>
-                <p className="mt-1 text-xs text-[var(--text-subtle)]">PDF or Word (.docx) · max 10 MB</p>
+                  <p className="mt-1 text-xs text-[var(--text-subtle)]">PDF or Word (.docx) · max 10 MB</p>
                 </div>
               </label>
             )}
