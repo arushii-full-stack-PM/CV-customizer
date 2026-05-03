@@ -70,8 +70,9 @@ export function CVForm({ isSignedIn, email = "", onSignIn }: CVFormProps) {
 
       // Step 3: Analyze
       const analysisRes = await fetch("/api/analyze", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ jdText: jdData.text, cvText: cvData.text, email }) })
-      const analysisData = await analysisRes.json()
-      if (!analysisData.matchScore) throw new Error("Analysis failed")
+const analysisData = await analysisRes.json()
+if (analysisRes.status === 429) throw new Error(analysisData.error || "Rate limit reached")
+if (!analysisData.matchScore) throw new Error("Analysis failed")
 
       // Step 4: Store everything and redirect
       sessionStorage.removeItem("cvAnalysis")
