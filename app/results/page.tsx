@@ -4,6 +4,13 @@ import { CheckCircle2, XCircle, AlertTriangle, Zap, BarChart2, FileText } from "
 
 interface AnalysisResult {
   matchScore: number
+  scoreBreakdown?: {
+    mustHaveSkills: number
+    experienceMatch: number
+    niceToHave: number
+    domainFit: number
+    reasoning: string
+  }
   matchedKeywords: string[]
   missingKeywords: string[]
   skillsGap: { jdRequires: string; cvHas: string }[]
@@ -13,13 +20,13 @@ interface AnalysisResult {
 }
 
 function ScoreRing({ score }: { score: number }) {
-  const color = score >= 70 ? "#22c55e" : score >= 40 ? "#eab308" : "#ef4444"
+  const color = score >= 75 ? "#22c55e" : score >= 40 ? "#eab308" : "#ef4444"
   const radius = 54
   const circumference = 2 * Math.PI * radius
   const offset = circumference - (score / 100) * circumference
 
   return (
-    <div className="flex flex-col items-center gap-3 py-10">
+    <div className="flex flex-col items-center gap-3 py-6">
       <div className="relative flex items-center justify-center">
         <svg width="140" height="140" className="-rotate-90">
           <circle cx="70" cy="70" r={radius} fill="none" stroke="#1e293b" strokeWidth="10" />
@@ -38,8 +45,49 @@ function ScoreRing({ score }: { score: number }) {
       </div>
       <p className="text-lg font-semibold text-[var(--text-muted)]">Match Score</p>
       <p className="text-sm text-[var(--text-subtle)]">
-        {score >= 70 ? "🟢 Strong match — a few tweaks and you're set!" : score >= 40 ? "🟡 Moderate match — some gaps to address" : "🔴 Low match — significant changes recommended"}
+        {score >= 75
+          ? "🟢 Strong match — a few tweaks and you're set!"
+          : score >= 40
+          ? "🟡 Moderate match — some gaps to address"
+          : "🔴 Low match — significant changes recommended"}
       </p>
+    </div>
+  )
+}
+
+function ScoreBreakdown({ breakdown }: { breakdown: NonNullable<AnalysisResult["scoreBreakdown"]> }) {
+  const bars = [
+    { label: "Must-have Skills", score: breakdown.mustHaveSkills, max: 60 },
+    { label: "Experience Match", score: breakdown.experienceMatch, max: 20 },
+    { label: "Nice-to-haves", score: breakdown.niceToHave, max: 10 },
+    { label: "Domain Fit", score: breakdown.domainFit, max: 10 },
+  ]
+
+  return (
+    <div className="rounded-2xl border border-white/10 bg-white/5 p-6 mb-8">
+      <h2 className="font-semibold text-foreground mb-5">Score Breakdown</h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-5">
+        {bars.map((item) => {
+          const pct = Math.min(100, (item.score / item.max) * 100)
+          const barColor = pct >= 75 ? "bg-green-400" : pct >= 50 ? "bg-yellow-400" : "bg-red-400"
+          return (
+            <div key={item.label} className="flex flex-col gap-1.5">
+              <div className="flex justify-between text-xs">
+                <span className="text-[var(--text-muted)]">{item.label}</span>
+                <span className="font-bold text-primary">{item.score}<span className="text-[var(--text-subtle)] font-normal">/{item.max}</span></span>
+              </div>
+              <div className="h-2 rounded-full bg-white/10 overflow-hidden">
+                <div className={`h-2 rounded-full transition-all duration-700 ${barColor}`} style={{ width: `${pct}%` }} />
+              </div>
+            </div>
+          )
+        })}
+      </div>
+      {breakdown.reasoning && (
+        <div className="border-t border-white/10 pt-4">
+          <p className="text-sm text-[var(--text-muted)] italic">💬 {breakdown.reasoning}</p>
+        </div>
+      )}
     </div>
   )
 }
@@ -51,9 +99,14 @@ export default function ResultsPage() {
 
   useEffect(() => {
     const stored = sessionStorage.getItem("cvAnalysis")
-    if (stored) {
+    const timestamp = sessionStorage.getItem("cvAnalysisTimestamp")
+    const isStale = !timestamp || (Date.now() - parseInt(timestamp)) > 3600000
+
+    if (stored && !isStale) {
       setData(JSON.parse(stored))
     } else {
+      sessionStorage.removeItem("cvAnalysis")
+      sessionStorage.removeItem("cvAnalysisTimestamp")
       setNotFound(true)
     }
   }, [])
@@ -82,13 +135,23 @@ export default function ResultsPage() {
   return (
     <main className="flex flex-1 flex-col items-center px-6 pb-20 pt-10">
       <div className="w-full max-w-5xl">
+
+        {/* Back link */}
         <div className="mb-6">
           <a href="/" className="text-sm text-primary hover:underline">← Analyze Another</a>
         </div>
+
+        {/* Score Ring */}
         <div className="rounded-2xl border border-white/10 bg-white/5 p-6 mb-8">
           <ScoreRing score={data.matchScore} />
         </div>
+
+        {/* Score Breakdown */}
+        {data.scoreBreakdown && <ScoreBreakdown breakdown={data.scoreBreakdown} />}
+
+        {/* 6 Cards */}
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+
           {/* Matched Keywords */}
           <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
             <div className="flex items-center gap-2 mb-4">
@@ -101,6 +164,7 @@ export default function ResultsPage() {
               ))}
             </div>
           </div>
+
           {/* Missing Keywords */}
           <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
             <div className="flex items-center gap-2 mb-4">
@@ -113,6 +177,7 @@ export default function ResultsPage() {
               ))}
             </div>
           </div>
+
           {/* Skills Gap */}
           <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
             <div className="flex items-center gap-2 mb-4">
@@ -136,7 +201,8 @@ export default function ResultsPage() {
               </tbody>
             </table>
           </div>
-          {/* Rewrites */}
+
+          {/* Suggested Rewrites */}
           <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
             <div className="flex items-center gap-2 mb-4">
               <FileText className="text-primary h-5 w-5" />
@@ -160,6 +226,7 @@ export default function ResultsPage() {
               ))}
             </div>
           </div>
+
           {/* Red Flags */}
           <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
             <div className="flex items-center gap-2 mb-4">
@@ -175,6 +242,7 @@ export default function ResultsPage() {
               ))}
             </ul>
           </div>
+
           {/* Quick Wins */}
           <div className="rounded-2xl border border-white/10 bg-white/5 p-6">
             <div className="flex items-center gap-2 mb-4">
@@ -190,6 +258,7 @@ export default function ResultsPage() {
               ))}
             </ol>
           </div>
+
         </div>
       </div>
     </main>
