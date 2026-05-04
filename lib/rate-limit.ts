@@ -7,7 +7,6 @@ const redis = new Redis({
 
 const UNLIMITED_EMAILS = [
   "arushii.gupta@nmims.edu.in", // add your personal gmail here too
-  "arushii.banasthali@gmail.com",
 ]
 
 export async function checkIpLimit(
