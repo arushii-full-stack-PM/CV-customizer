@@ -4,9 +4,10 @@ import { CVForm } from "@/components/cv-form"
 
 interface CVFormWrapperProps {
   isSignedIn: boolean
+  remaining: number | null
 }
 
-export function CVFormWrapper({ isSignedIn }: CVFormWrapperProps) {
+export function CVFormWrapper({ isSignedIn, remaining }: CVFormWrapperProps) {
   const { data: session } = useSession()
   const email = session?.user?.email || ""
 
@@ -14,6 +15,7 @@ export function CVFormWrapper({ isSignedIn }: CVFormWrapperProps) {
     <CVForm
       isSignedIn={isSignedIn}
       email={email}
+      remaining={remaining}
       onSignIn={() => {
         window.location.href = "/api/auth/signin"
       }}
