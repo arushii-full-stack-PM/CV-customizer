@@ -17,6 +17,7 @@ export async function POST(req: NextRequest) {
     }
 
     const { jdText, cvText, email } = await req.json()
+    console.log("Email received in API:", email)
 
     if (!jdText || !cvText) {
       return NextResponse.json({ error: "JD and CV text are required" }, { status: 400 })
