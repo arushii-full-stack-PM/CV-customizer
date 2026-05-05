@@ -5,10 +5,11 @@ import { Lock, Upload, FileCheck, X, ArrowRight } from "lucide-react"
 interface CVFormProps {
   isSignedIn: boolean
   email?: string
+  remaining?: number | null
   onSignIn: () => void
 }
 
-export function CVForm({ isSignedIn, email = "", onSignIn }: CVFormProps) {
+export function CVForm({ isSignedIn, email = "", remaining, onSignIn }: CVFormProps) {
   const [jdUrl, setJdUrl] = useState("")
   const [uploadedFile, setUploadedFile] = useState<File | null>(null)
   const [isDragging, setIsDragging] = useState(false)
@@ -17,6 +18,8 @@ export function CVForm({ isSignedIn, email = "", onSignIn }: CVFormProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [analysisError, setAnalysisError] = useState("")
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const isLimitReached = remaining === 0
 
   const handleFile = useCallback((file: File | null | undefined) => {
     setFileError("")
@@ -70,9 +73,12 @@ export function CVForm({ isSignedIn, email = "", onSignIn }: CVFormProps) {
 
       // Step 3: Analyze
       const analysisRes = await fetch("/api/analyze", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ jdText: jdData.text, cvText: cvData.text, email }) })
-const analysisData = await analysisRes.json()
-if (analysisRes.status === 429) throw new Error(analysisData.error || "Rate limit reached")
-if (!analysisData.matchScore) throw new Error("Analysis failed")
+      const analysisData = await analysisRes.json()
+      if (analysisRes.status === 429) {
+        if (analysisData.limitReached) throw new Error("LIMIT_REACHED")
+        throw new Error(analysisData.error || "Too many requests. Please try again later.")
+      }
+      if (!analysisData.matchScore) throw new Error("Analysis failed")
 
       // Step 4: Store everything and redirect
       sessionStorage.removeItem("cvAnalysis")
@@ -85,7 +91,11 @@ if (!analysisData.matchScore) throw new Error("Analysis failed")
 
     } catch (error) {
       console.error(error)
-      setAnalysisError("Something went wrong. Please try again.")
+      if (error instanceof Error && error.message === "LIMIT_REACHED") {
+        setAnalysisError("You have used your 2 free analyses. DM Arushii on LinkedIn to request more access.")
+      } else {
+        setAnalysisError("Something went wrong. Please try again.")
+      }
     } finally {
       setIsLoading(false)
     }
@@ -94,17 +104,29 @@ if (!analysisData.matchScore) throw new Error("Analysis failed")
   return (
     <div className="relative w-full">
       <div className={`relative rounded-2xl border border-[var(--border)] bg-[var(--card)] p-4 shadow-2xl transition-all duration-300 ${!isSignedIn ? "overflow-hidden" : ""}`}>
+
+        {/* Limit reached banner */}
+        {isSignedIn && isLimitReached && (
+          <div className="mb-4 rounded-xl bg-red-500/10 border border-red-500/30 px-4 py-3 text-sm text-red-400 text-center">
+            ❌ You have used your 2 free analyses.{" "}
+            <a href="https://www.linkedin.com/in/arushii-gupta-1a33b112/" target="_blank" rel="noopener noreferrer" className="underline font-semibold hover:text-red-300">
+              DM Arushii on LinkedIn
+            </a>{" "}
+            to request more access.
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} noValidate>
 
           <div className="mb-6">
             <label htmlFor="jd-url" className="mb-2 block text-sm font-semibold text-foreground">Job Description URL</label>
-            <input id="jd-url" type="url" value={jdUrl} onChange={(e) => { setJdUrl(e.target.value); if (e.target.value) setUrlError("") }} placeholder="Paste the JD URL here (LinkedIn, Naukri, etc.)" disabled={!isSignedIn} className="w-full rounded-xl border border-[var(--border)] bg-[var(--navy-surface)] py-3 px-4 text-sm text-foreground placeholder:text-[var(--text-subtle)] transition-colors focus:border-primary focus:outline-none disabled:cursor-not-allowed disabled:opacity-50" />
+            <input id="jd-url" type="url" value={jdUrl} onChange={(e) => { setJdUrl(e.target.value); if (e.target.value) setUrlError("") }} placeholder="Paste the JD URL here (LinkedIn, Naukri, etc.)" disabled={!isSignedIn || isLimitReached} className="w-full rounded-xl border border-[var(--border)] bg-[var(--navy-surface)] py-3 px-4 text-sm text-foreground placeholder:text-[var(--text-subtle)] transition-colors focus:border-primary focus:outline-none disabled:cursor-not-allowed disabled:opacity-50" />
             {urlError && <p className="mt-1.5 text-xs text-red-400">{urlError}</p>}
           </div>
 
           <div className="mb-6">
             <label className="mb-2 block text-sm font-semibold text-foreground">Upload Your CV <span className="font-normal text-[var(--text-subtle)]">(PDF or Word)</span></label>
-            <input ref={fileInputRef} id="cv-upload" type="file" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" onChange={handleInputChange} disabled={!isSignedIn} className="sr-only" />
+            <input ref={fileInputRef} id="cv-upload" type="file" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" onChange={handleInputChange} disabled={!isSignedIn || isLimitReached} className="sr-only" />
             {uploadedFile ? (
               <div className="flex items-center justify-between rounded-xl border border-primary/40 bg-primary/10 px-4 w-full min-h-[120px]">
                 <div className="flex items-center gap-3">
@@ -117,7 +139,7 @@ if (!analysisData.matchScore) throw new Error("Analysis failed")
                 <button type="button" onClick={removeFile} className="rounded-lg p-1 text-[var(--text-subtle)] hover:text-foreground"><X className="h-4 w-4" /></button>
               </div>
             ) : (
-              <label htmlFor="cv-upload" onDrop={handleDrop} onDragOver={handleDragOver} onDragLeave={handleDragLeave} className={`flex cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed px-6 text-center transition-all duration-200 min-h-[120px] ${isDragging ? "border-primary bg-primary/10" : "border-white/30 bg-[var(--navy-surface)] hover:border-primary/70"} ${!isSignedIn ? "pointer-events-none opacity-50" : ""}`}>
+              <label htmlFor="cv-upload" onDrop={handleDrop} onDragOver={handleDragOver} onDragLeave={handleDragLeave} className={`flex cursor-pointer flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed px-6 text-center transition-all duration-200 min-h-[120px] ${isDragging ? "border-primary bg-primary/10" : "border-white/30 bg-[var(--navy-surface)] hover:border-primary/70"} ${(!isSignedIn || isLimitReached) ? "pointer-events-none opacity-50" : ""}`}>
                 <div className={`flex h-12 w-12 items-center justify-center rounded-full ${isDragging ? "bg-primary/20" : "bg-[var(--navy-elevated)]"}`}>
                   <Upload className={`h-5 w-5 ${isDragging ? "text-primary" : "text-[var(--text-muted)]"}`} />
                 </div>
@@ -130,15 +152,27 @@ if (!analysisData.matchScore) throw new Error("Analysis failed")
             {fileError && <p className="mt-1.5 text-xs text-red-400">{fileError}</p>}
           </div>
 
-          {analysisError && <p className="mb-4 text-sm text-red-400 text-center">{analysisError}</p>}
+          {analysisError && (
+            <div className="mb-4 rounded-xl bg-red-500/10 border border-red-500/20 px-4 py-3 text-sm text-red-400 text-center">
+              {analysisError}
+            </div>
+          )}
 
-          <button type="submit" disabled={!isSignedIn || isLoading} className="group flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3.5 text-base font-semibold text-white shadow-lg transition-all hover:bg-primary/90 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60">
+          <button
+            type="submit"
+            disabled={!isSignedIn || isLoading || isLimitReached}
+            className="group flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3.5 text-base font-semibold text-white shadow-lg transition-all hover:bg-primary/90 active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
+          >
             {isLoading ? (
               <><svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/></svg>Analyzing your CV...</>
             ) : (
-              <>{isSignedIn ? "Analyze My CV" : "Sign in to Analyze"}<ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" /></>
+              <>
+                {!isSignedIn ? "Sign in to Analyze" : isLimitReached ? "No Analyses Remaining" : "Analyze My CV"}
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+              </>
             )}
           </button>
+
         </form>
 
         {!isSignedIn && (
