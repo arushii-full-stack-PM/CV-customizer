@@ -9,7 +9,6 @@ const redis = new Redis({
 
 const UNLIMITED_EMAILS = [
   "arushii.gupta@nmims.edu.in",
-  "arushii.banasthali@gmail.com",
 ]
 
 const MAX_ANALYSES = 2
