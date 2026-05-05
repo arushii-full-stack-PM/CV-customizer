@@ -1,5 +1,18 @@
 import { auth } from "@/auth"
 import { CVFormWrapper } from "@/components/cv-form-wrapper"
+import { Redis } from "@upstash/redis"
+
+const redis = new Redis({
+  url: process.env.KV_REST_API_URL!,
+  token: process.env.KV_REST_API_TOKEN!,
+})
+
+const UNLIMITED_EMAILS = [
+  "arushii.gupta@nmims.edu.in",
+  "arushii.banasthali@gmail.com",
+]
+
+const MAX_ANALYSES = 2
 
 const TRUST_SIGNALS = [
   { icon: "🔒", text: "Your CV is never stored" },
@@ -7,8 +20,17 @@ const TRUST_SIGNALS = [
   { icon: "🎯", text: "Tailored to every job" },
 ]
 
+async function getRemainingAnalyses(email: string): Promise<number | null> {
+  if (UNLIMITED_EMAILS.includes(email.toLowerCase())) return null
+  const key = `usage:email:${email.toLowerCase()}`
+  const count = await redis.get<number>(key) || 0
+  return Math.max(0, MAX_ANALYSES - count)
+}
+
 export default async function Home() {
   const session = await auth()
+  const email = session?.user?.email || ""
+  const remaining = email ? await getRemainingAnalyses(email) : null
 
   return (
     <div className="flex flex-col items-center px-4 pt-2 pb-0">
@@ -29,7 +51,7 @@ export default async function Home() {
         </div>
 
         {/* Trust signals */}
-        <div className="mb-5 flex flex-wrap items-center justify-center gap-2">
+        <div className="mb-3 flex flex-wrap items-center justify-center gap-2">
           {TRUST_SIGNALS.map((signal) => (
             <div key={signal.text} className="flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-sm text-slate-200">
               <span>{signal.icon}</span>
@@ -38,15 +60,36 @@ export default async function Home() {
           ))}
         </div>
 
-<p className="mb-3 text-center text-sm text-slate-300">
-  {session
-    ? `✅ Signed in with ${session.user?.email}`
-    : "🔐 We use sign-in to prevent abuse and keep your results private."}
-</p>
+        {/* Sign in status + remaining analyses */}
+        <div className="mb-3 flex flex-col items-center gap-1.5">
+          <p className="text-center text-sm text-slate-300">
+            {session
+              ? `✅ Signed in with ${session.user?.email}`
+              : "🔐 We use sign-in to prevent abuse and keep your results private."}
+          </p>
+          {session && remaining !== null && (
+            <div className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold border ${
+              remaining === 0
+                ? "bg-red-500/10 border-red-500/30 text-red-400"
+                : remaining === 1
+                ? "bg-yellow-500/10 border-yellow-500/30 text-yellow-400"
+                : "bg-green-500/10 border-green-500/30 text-green-400"
+            }`}>
+              {remaining === 0
+                ? "❌ No analyses remaining"
+                : `🎯 ${remaining} free ${remaining === 1 ? "analysis" : "analyses"} remaining`}
+            </div>
+          )}
+          {session && remaining === null && (
+            <div className="flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold border bg-primary/10 border-primary/30 text-primary">
+              ✨ Unlimited analyses
+            </div>
+          )}
+        </div>
 
-<div className="w-full mb-20">
-  <CVFormWrapper isSignedIn={!!session} />
-</div>
+        <div className="w-full mb-20">
+          <CVFormWrapper isSignedIn={!!session} remaining={remaining} />
+        </div>
 
       </div>
     </div>
